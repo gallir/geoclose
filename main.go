@@ -20,6 +20,7 @@ const (
 
 type StringMap map[string]string
 
+// MarshalCSV generates the string to put additional columns in one
 func (sm StringMap) MarshalCSV() ([]byte, error) {
 	if len(sm) == 0 {
 		return []byte{}, nil
@@ -67,24 +68,32 @@ func main() {
 	saveCSV(outFile, results)
 
 }
+
 func processParallel(data, toSearch []Row) (rows []Result) {
 	p := runtime.NumCPU()
 	s := len(toSearch) / p
 
 	ch := make(chan []Result)
+	dispatched := 0
+	// Process segments en parallel
 	for len(toSearch) > 0 {
 		end := s
 		if end > len(toSearch) {
 			end = len(toSearch)
 		}
+
+		// Dispatc a segment
 		go func(d1, d2 []Row) {
 			r := process(d1, d2)
 			ch <- r
 		}(data, toSearch[:end])
+		dispatched++
+
 		toSearch = toSearch[end:]
 	}
 
-	for i := 0; i < p; i++ {
+	// Collent
+	for i := 0; i < dispatched; i++ {
 		rr := <-ch
 		rows = append(rows, rr...)
 	}
