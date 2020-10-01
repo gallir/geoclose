@@ -82,7 +82,7 @@ func processParallel(data, toSearch []Row) (rows []Result) {
 			end = len(toSearch)
 		}
 
-		// Dispatc a segment
+		// Dispatch a segment
 		go func(d1, d2 []Row) {
 			r := process(d1, d2)
 			ch <- r
@@ -92,7 +92,7 @@ func processParallel(data, toSearch []Row) (rows []Result) {
 		toSearch = toSearch[end:]
 	}
 
-	// Collent
+	// Collect the results
 	for i := 0; i < dispatched; i++ {
 		rr := <-ch
 		rows = append(rows, rr...)
@@ -185,6 +185,7 @@ func loadCSV(filename string) (rows []Row) {
 		for _, i := range dec.Unused() {
 			r.Others[header[i]] = dec.Record()[i]
 		}
+		// Create the geo point if lat and lgt are not zero
 		if r.Latitude != 0 || r.Longitude != 0 {
 			r.geo = geo.NewPoint(r.Latitude, r.Longitude)
 		}
