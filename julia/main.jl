@@ -60,11 +60,11 @@ function processParallel(data, toSearch)
 end
 
 function process(data, toSearch)
-    df = DataFrame(id_search = Int[], id_data = Int[], distance_m = Int[])
-    for s in eachrow(toSearch)
+    df = DataFrame(id_search=Int[], id_data=Int[], distance_m=Int[])
+    for s in toSearch
         minDistance = maxintfloat()
         picked = nothing
-        for d in eachrow(data)
+        for d in data
             if d.latitude == 0.0 && d.longitude == 0.0
                 continue
             end
@@ -92,7 +92,8 @@ end
 
 function load_csv(filename)
     df = CSV.read(filename, DataFrame)
-    return df
+    t = Tables.rowtable(df[:, ["id", "latitude", "longitude"]])
+    return t
 end
 
 function parse_commandline()
