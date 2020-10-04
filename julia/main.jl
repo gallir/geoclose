@@ -10,9 +10,13 @@ const stopAtDistance = 0.001
 
 function main()
     args = parse_commandline()
+    process(args)
+end
+
+function process(args)
     data = load_csv(args["data"])
     toSearch = load_csv(args["search"])
-    res = processParallel(data, toSearch)
+    res = process_rows_parallel(data, toSearch)
     if isempty(args["output"])
         print(res)
     else
@@ -20,7 +24,7 @@ function main()
     end
 end
 
-function processParallel(data, toSearch)
+function process_rows_parallel(data, toSearch)
     rows = nothing
     p = Threads.nthreads()
     println("Threads $p")
@@ -40,7 +44,7 @@ function processParallel(data, toSearch)
 
     for s in segments
         # Dispatch a segment
-        t = @spawn process(data, s)
+        t = @spawn process_rows(data, s)
         push!(dispatched, t)
     end
 
@@ -59,7 +63,7 @@ function processParallel(data, toSearch)
     return rows
 end
 
-function process(data, toSearch)
+function process_rows(data, toSearch)
     df = DataFrame(id_search=Int[], id_data=Int[], distance_m=Int[])
     for s in toSearch
         minDistance = maxintfloat()
@@ -117,5 +121,8 @@ function parse_commandline()
     return parse_args(s)
 end
 
-main()
+if ! isinteractive() 
+    main()
+end
+
 end
