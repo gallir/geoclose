@@ -8,7 +8,7 @@ import Base.Threads.@spawn
 
 const stopAtDistance = 0.001
 
-Base.@ccallable function julia_main()::Cint
+function julia_main()::Cint
     try
         main()
     catch
@@ -27,8 +27,8 @@ function process(args)
     data = load_csv(args["data"])
     toSearch = load_csv(args["search"])
     res = process_rows_parallel(data, toSearch)
-    if isempty(args["output"])
-        print(res)
+    if isnothing(args["output"])
+        println(res)
     else
         CSV.write(args["output"], res)
     end
