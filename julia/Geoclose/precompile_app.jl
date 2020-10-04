@@ -1,5 +1,6 @@
-# using Geoclose
-include("src/Geoclose.jl")
+using Geoclose
+# include("src/Geoclose.jl")
 
-append!(ARGS, ["-s", "../../csv/search.csv", "-d", "../../csv/data.csv", "-o", "/tmp/geoclose_preconpile.csv"]) 
+path = dirname(Base.source_path())
+append!(ARGS, ["-s", "$path/csv/search.csv", "-d", "$path/csv/data.csv", "-o", "/tmp/geoclose_precompile.csv"]) 
 Geoclose.julia_main()

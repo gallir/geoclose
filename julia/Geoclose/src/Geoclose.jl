@@ -105,6 +105,7 @@ function process_rows(data, toSearch)
 end
 
 function load_csv(filename)
+    println(stderr, "Reading $filename from $(pwd())")
     df = CSV.read(filename, DataFrame)
     t = Tables.rowtable(df[:, ["id", "latitude", "longitude"]])
     return t
