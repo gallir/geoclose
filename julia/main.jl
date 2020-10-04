@@ -8,6 +8,16 @@ import Base.Threads.@spawn
 
 const stopAtDistance = 0.001
 
+Base.@ccallable function julia_main()::Cint
+    try
+        main()
+    catch
+        Base.invokelatest(Base.display_error, Base.catch_stack())
+        return 1
+    end
+    return 0
+end
+
 function main()
     args = parse_commandline()
     process(args)
@@ -121,7 +131,7 @@ function parse_commandline()
     return parse_args(s)
 end
 
-if ! isinteractive() 
+if abspath(PROGRAM_FILE) == @__FILE__ 
     main()
 end
 
