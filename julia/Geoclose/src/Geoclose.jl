@@ -8,6 +8,16 @@ import Base.Threads.@spawn
 
 const stopAtDistance = 0.001
 
+function julia_main()::Cint
+    try
+        main()
+    catch
+        Base.invokelatest(Base.display_error, Base.catch_stack())
+        return 1
+    end
+    return 0
+end
+
 function main()
     args = parse_commandline()
     process(args)
@@ -17,8 +27,8 @@ function process(args)
     data = load_csv(args["data"])
     toSearch = load_csv(args["search"])
     res = process_rows_parallel(data, toSearch)
-    if isempty(args["output"])
-        print(res)
+    if isnothing(args["output"])
+        println(res)
     else
         CSV.write(args["output"], res)
     end
@@ -95,6 +105,7 @@ function process_rows(data, toSearch)
 end
 
 function load_csv(filename)
+    println(stderr, "Reading $filename from $(pwd())")
     df = CSV.read(filename, DataFrame)
     t = Tables.rowtable(df[:, ["id", "latitude", "longitude"]])
     return t
@@ -121,7 +132,7 @@ function parse_commandline()
     return parse_args(s)
 end
 
-if ! isinteractive() 
+if abspath(PROGRAM_FILE) == @__FILE__ 
     main()
 end
 
